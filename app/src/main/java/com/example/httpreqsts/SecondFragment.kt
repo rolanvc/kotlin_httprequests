@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import com.android.volley.toolbox.Volley
 import com.android.volley.Request
 import com.android.volley.Response
+import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import org.json.JSONArray
@@ -48,11 +49,19 @@ class SecondFragment : Fragment() {
 
 // Request a string response from the provided URL.
         val stringRequest = JsonObjectRequest(Request.Method.GET, url, null,
-            Response.Listener { response ->
-                // Display the first 500 characters of the response string.
-                textView.text = "Response is: ${response}"
-            },
-            Response.ErrorListener { textView.text = "That didn't work!" })
+            Response.Listener {response ->
+                    var displayResponse = "Response is: "
+                    val testArray = response.getJSONArray("array")
+                    for (i in 0..(testArray.length()-1)) {
+                        val item :String = testArray.get(i) as String
+                        displayResponse += "${item}, "
+                    }
+                    val testHello = response.getString("hello")
+                    displayResponse += testHello
+                    textView.text = "Response is: ${displayResponse}"
+            }, Response.ErrorListener { error ->
+                textView.text = "That didn't work! Error was:${error} "
+        })
 
 // Add the request to the RequestQueue.
         queue.add(stringRequest)
